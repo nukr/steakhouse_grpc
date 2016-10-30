@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package steakhouse;
+
+import "google/api/annotations.proto";
+
+message Cuisine {
+  string name = 1;
+  string description = 2;
+  float price = 3;
+  string id = 4;
+  bool is_delete = 5;
+  map<string, string> metadata = 6;
+}
+
+message menu {
+  string name = 1;
+  string description = 2;
+  repeated Cuisine cuisines = 3;
+  string id = 4;
+}
+
+message intstr {
+  int32 num = 1;
+  string name = 2;
+}
+
+message order {
+  int64 created_at = 1;
+  int64 updated_at = 2;
+  intstr discount = 3;
+}
+
+message Query {
+  string id = 1;
+}
+
+message status {
+  int32 code = 1;
+  string msg = 2;
+}
+
+service Steakhouse {
+  rpc GetCuisine(Query) returns (Cuisine) {
+    option (google.api.http) = {
+      get: "/v1/cuisine/{id}"
+    };
+  }
+  rpc GetCuisines(Query) returns (stream Cuisine) {
+    option (google.api.http) = {
+      get: "/v1/cuisines"
+    };
+  }
+  rpc CreateCuisine(stream Cuisine) returns (stream status) {
+    option (google.api.http) = {
+      post: "/v1/cuisine"
+      body: "*"
+    };
+  }
+}
