@@ -62,15 +62,26 @@ func (s *Server) CreateCuisine(stream pb.Steakhouse_CreateCuisineServer) error {
 		}
 		checkerrors.Do(err, "fatal")
 
-		db.Exec(`
+		result, err := db.Exec(`
     INSERT INTO cuisine (id, name, description, price)
     VALUES ($1, $2, $3, $4)
     `, in.Id, in.Name, in.Description, in.Price)
+		checkerrors.Do(err, "fatal")
 
-		stream.Send(&pb.Status{
-			Code: 0,
-			Msg:  "done",
-		})
+		affected, err := result.RowsAffected()
+		checkerrors.Do(err, "fatal")
+
+		if affected > 0 {
+			stream.Send(&pb.Status{
+				Code: 0,
+				Msg:  "done",
+			})
+		} else {
+			stream.Send(&pb.Status{
+				Code: 999,
+				Msg:  "no new row",
+			})
+		}
 	}
 }
 
