@@ -9,7 +9,7 @@ message Cuisine {
   string description = 2;
   float price = 3;
   string id = 4;
-  bool is_delete = 5;
+  bool is_deleted = 5;
   map<string, string> metadata = 6;
 }
 
@@ -51,6 +51,18 @@ service Steakhouse {
       get: "/v1/cuisines"
     };
   }
+  rpc UpdateCuisine(Cuisine) returns (status) {
+    option (google.api.http) = {
+      put: "/v1/cuisine/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteCuisine(Query) returns (status) {
+    option (google.api.http) = {
+      delete: "/v1/cuisine/{id}"
+    };
+  }
+
   rpc CreateCuisine(stream Cuisine) returns (stream status) {
     option (google.api.http) = {
       post: "/v1/cuisine"

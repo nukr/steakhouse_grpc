@@ -31,25 +31,51 @@ type Server struct{}
 
 // GetCuisine ...
 func (s *Server) GetCuisine(ctx context.Context, in *pb.Query) (*pb.Cuisine, error) {
-	db.Exec(`
-  SELECT * from cuisine
-  `)
-	return &pb.Cuisine{
-		Name:        "aa",
-		Description: "bb",
-	}, nil
+	q := db.QueryRow(`
+  SELECT id, name, description, price, is_deleted from cuisine
+  WHERE id = $1
+  `, in.Id)
+
+	var id, name, description string
+	var price float32
+	var isDeleted bool
+
+	err := q.Scan(&id, &name, &description, &price, &isDeleted)
+	checkerrors.Do(err, "fatal")
+	cuisine := &pb.Cuisine{
+		Id:          id,
+		Name:        name,
+		Description: description,
+		Price:       price,
+		IsDeleted:   isDeleted,
+	}
+
+	return cuisine, nil
 }
 
 // GetCuisines ...
 func (s *Server) GetCuisines(in *pb.Query, stream pb.Steakhouse_GetCuisinesServer) error {
-	stream.Send(&pb.Cuisine{
-		Name:        "aa",
-		Description: "bb",
-	})
-	stream.Send(&pb.Cuisine{
-		Name:        "bb",
-		Description: "cc",
-	})
+	rows, err := db.Query(`
+  SELECT id, name, description, price, is_deleted from cuisine
+  `)
+
+	checkerrors.Do(err, "fatal")
+
+	defer rows.Close()
+	for rows.Next() {
+		var id, name, description string
+		var price float32
+		var isDeleted bool
+		err := rows.Scan(&id, &name, &description, &price, &isDeleted)
+		checkerrors.Do(err, "fatal")
+		stream.Send(&pb.Cuisine{
+			Id:          id,
+			Name:        name,
+			Description: description,
+			Price:       price,
+			IsDeleted:   isDeleted,
+		})
+	}
 	return nil
 }
 
@@ -83,6 +109,49 @@ func (s *Server) CreateCuisine(stream pb.Steakhouse_CreateCuisineServer) error {
 			})
 		}
 	}
+}
+
+// UpdateCuisine ...
+func (s *Server) UpdateCuisine(ctx context.Context, in *pb.Cuisine) (*pb.Status, error) {
+	result, err := db.Exec(`
+  UPDATE cuisine
+  SET name = $1, description = $2, price = $3
+  WHERE id = $4
+  `, in.Name, in.Description, in.Price, in.Id)
+	checkerrors.Do(err, "fatal")
+	affected, err := result.RowsAffected()
+	checkerrors.Do(err, "fatal")
+	if affected > 0 {
+		return &pb.Status{
+			Code: 0,
+			Msg:  "done",
+		}, nil
+	}
+	return &pb.Status{
+		Code: 999,
+		Msg:  "no new row",
+	}, nil
+}
+
+// DeleteCuisine ...
+func (s *Server) DeleteCuisine(ctx context.Context, in *pb.Query) (*pb.Status, error) {
+	result, err := db.Exec(`
+  DELETE FROM cuisine
+  WHERE id = $1
+  `, in.Id)
+	checkerrors.Do(err, "fatal")
+	affected, err := result.RowsAffected()
+	checkerrors.Do(err, "fatal")
+	if affected > 0 {
+		return &pb.Status{
+			Code: 0,
+			Msg:  "done",
+		}, nil
+	}
+	return &pb.Status{
+		Code: 999,
+		Msg:  "no new row",
+	}, nil
 }
 
 func main() {

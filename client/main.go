@@ -18,27 +18,45 @@ func main() {
 	checkerrors.Do(err, "fatal")
 	defer conn.Close()
 	client := pb.NewSteakhouseClient(conn)
-	createCuisine(client)
+	deleteCuisine(client)
+}
+
+func updateCuisine(client pb.SteakhouseClient) {
+	cuisine := &pb.Cuisine{
+		Name:        "bb",
+		Price:       23.4,
+		Description: "bb",
+		Id:          "6856ceec-f2a3-45ce-8430-cee031ebd651",
+	}
+	status, err := client.UpdateCuisine(context.Background(), cuisine)
+	checkerrors.Do(err, "fatal")
+	fmt.Println(status)
+}
+
+func deleteCuisine(client pb.SteakhouseClient) {
+	status, err := client.DeleteCuisine(context.Background(), &pb.Query{Id: "d9d103d0-e3c6-45de-bbc4-12dc46fed97b"})
+	checkerrors.Do(err, "fatal")
+	fmt.Println(status)
 }
 
 func getCuisine(client pb.SteakhouseClient) {
-	cuisine, err := client.GetCuisine(context.Background(), &pb.Query{Id: "123123"})
+	cuisine, err := client.GetCuisine(context.Background(), &pb.Query{Id: "d1097c54-6e9a-4f8e-8072-756b561bff0b"})
 	checkerrors.Do(err, "fatal")
 	fmt.Println(cuisine)
 }
 
 func getCuisines(client pb.SteakhouseClient) {
+	start := time.Now()
 	stream, err := client.GetCuisines(context.Background(), &pb.Query{Id: "123123"})
 	checkerrors.Do(err, "fatal")
-	value, err := stream.Recv()
-	checkerrors.Do(err, "fatal")
-	fmt.Println("cuisine from stream", value)
-	value, err = stream.Recv()
-	checkerrors.Do(err, "fatal")
-	fmt.Println("cuisine from stream", value)
-	value, err = stream.Recv()
-	checkerrors.Do(err, "fatal")
-	fmt.Println("cuisine from stream", value)
+	for {
+		value, err := stream.Recv()
+		if err == io.EOF {
+			fmt.Println(time.Since(start))
+			return
+		}
+		fmt.Println(value)
+	}
 }
 
 func createCuisine(client pb.SteakhouseClient) {
