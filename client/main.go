@@ -18,7 +18,7 @@ func main() {
 	checkerrors.Do(err, "fatal")
 	defer conn.Close()
 	client := pb.NewSteakhouseClient(conn)
-	deleteCuisine(client)
+	createCuisine(client)
 }
 
 func updateCuisine(client pb.SteakhouseClient) {

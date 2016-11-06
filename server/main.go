@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 
 	pb "github.com/nukr/steakhouse_grpc/pb"
 	"golang.org/x/net/context"
@@ -17,10 +18,11 @@ import (
 
 var (
 	db     *sql.DB
-	dbaddr = "postgres://postgres:postgres@localhost:5432/steakhouse?sslmode=disable"
+	dbaddr string
 )
 
 func init() {
+	dbaddr = os.Getenv("DBADDR")
 	d, err := sql.Open("postgres", dbaddr)
 	checkerrors.Do(err, "fatal")
 	db = d
@@ -30,9 +32,18 @@ func init() {
 type Server struct{}
 
 // GetCuisine ...
-func (s *Server) GetCuisine(ctx context.Context, in *pb.Query) (*pb.Cuisine, error) {
+func (s *Server) GetCuisine(
+	ctx context.Context,
+	in *pb.Query,
+) (*pb.Cuisine, error) {
 	q := db.QueryRow(`
-  SELECT id, name, description, price, is_deleted from cuisine
+  SELECT
+    id,
+    name,
+    description,
+    price,
+    is_deleted
+  FROM cuisine
   WHERE id = $1
   `, in.Id)
 
@@ -54,7 +65,10 @@ func (s *Server) GetCuisine(ctx context.Context, in *pb.Query) (*pb.Cuisine, err
 }
 
 // GetCuisines ...
-func (s *Server) GetCuisines(in *pb.Query, stream pb.Steakhouse_GetCuisinesServer) error {
+func (s *Server) GetCuisines(
+	in *pb.Query,
+	stream pb.Steakhouse_GetCuisinesServer,
+) error {
 	rows, err := db.Query(`
   SELECT id, name, description, price, is_deleted from cuisine
   `)
@@ -112,7 +126,10 @@ func (s *Server) CreateCuisine(stream pb.Steakhouse_CreateCuisineServer) error {
 }
 
 // UpdateCuisine ...
-func (s *Server) UpdateCuisine(ctx context.Context, in *pb.Cuisine) (*pb.Status, error) {
+func (s *Server) UpdateCuisine(
+	ctx context.Context,
+	in *pb.Cuisine,
+) (*pb.Status, error) {
 	result, err := db.Exec(`
   UPDATE cuisine
   SET name = $1, description = $2, price = $3
@@ -134,7 +151,10 @@ func (s *Server) UpdateCuisine(ctx context.Context, in *pb.Cuisine) (*pb.Status,
 }
 
 // DeleteCuisine ...
-func (s *Server) DeleteCuisine(ctx context.Context, in *pb.Query) (*pb.Status, error) {
+func (s *Server) DeleteCuisine(
+	ctx context.Context,
+	in *pb.Query,
+) (*pb.Status, error) {
 	result, err := db.Exec(`
   DELETE FROM cuisine
   WHERE id = $1
