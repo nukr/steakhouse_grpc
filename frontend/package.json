@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "start": "next start",
+    "dev": "next dev",
+    "build": "next build"
+  },
+  "dependencies": {
+    "isomorphic-fetch": "^2.2.1",
+    "next": "^1.1.1",
+    "react": "^15.3.2",
+    "w3c-xmlhttprequest": "^2.1.2"
+  }
+}
