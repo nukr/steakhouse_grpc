@@ -5,7 +5,7 @@ package steakhouse;
 import "google/api/annotations.proto";
 
 message Cuisine {
-  string name = 1;
+  string title = 1;
   string description = 2;
   float price = 3;
   string id = 4;
@@ -14,7 +14,7 @@ message Cuisine {
 }
 
 message menu {
-  string name = 1;
+  string title = 1;
   string description = 2;
   repeated Cuisine cuisines = 3;
   string id = 4;

@@ -1,0 +1,197 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "steakhouse.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/cuisine": {
+      "post": {
+        "operationId": "CreateCuisine",
+        "responses": {
+          "200": {
+            "description": "(streaming responses)",
+            "schema": {
+              "$ref": "#/definitions/steakhousestatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "(streaming inputs)",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/steakhouseCuisine"
+            }
+          }
+        ],
+        "tags": [
+          "Steakhouse"
+        ]
+      }
+    },
+    "/v1/cuisine/{id}": {
+      "get": {
+        "operationId": "GetCuisine",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/steakhouseCuisine"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "Steakhouse"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteCuisine",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/steakhousestatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "Steakhouse"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateCuisine",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/steakhousestatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/steakhouseCuisine"
+            }
+          }
+        ],
+        "tags": [
+          "Steakhouse"
+        ]
+      }
+    },
+    "/v1/cuisines": {
+      "get": {
+        "operationId": "GetCuisines",
+        "responses": {
+          "200": {
+            "description": "(streaming responses)",
+            "schema": {
+              "$ref": "#/definitions/steakhouseCuisine"
+            }
+          }
+        },
+        "tags": [
+          "Steakhouse"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "steakhouseCuisine": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "format": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "string"
+        },
+        "is_deleted": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "price": {
+          "type": "number",
+          "format": "float"
+        },
+        "title": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "steakhouseQuery": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "steakhousestatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "msg": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    }
+  }
+}

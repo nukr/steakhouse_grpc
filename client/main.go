@@ -23,7 +23,7 @@ func main() {
 
 func updateCuisine(client pb.SteakhouseClient) {
 	cuisine := &pb.Cuisine{
-		Name:        "bb",
+		Title:       "bb",
 		Price:       23.4,
 		Description: "bb",
 		Id:          "6856ceec-f2a3-45ce-8430-cee031ebd651",
@@ -34,13 +34,17 @@ func updateCuisine(client pb.SteakhouseClient) {
 }
 
 func deleteCuisine(client pb.SteakhouseClient) {
-	status, err := client.DeleteCuisine(context.Background(), &pb.Query{Id: "d9d103d0-e3c6-45de-bbc4-12dc46fed97b"})
+	status, err := client.DeleteCuisine(
+		context.Background(),
+		&pb.Query{Id: "d9d103d0-e3c6-45de-bbc4-12dc46fed97b"})
 	checkerrors.Do(err, "fatal")
 	fmt.Println(status)
 }
 
 func getCuisine(client pb.SteakhouseClient) {
-	cuisine, err := client.GetCuisine(context.Background(), &pb.Query{Id: "d1097c54-6e9a-4f8e-8072-756b561bff0b"})
+	cuisine, err := client.GetCuisine(
+		context.Background(),
+		&pb.Query{Id: "d1097c54-6e9a-4f8e-8072-756b561bff0b"})
 	checkerrors.Do(err, "fatal")
 	fmt.Println(cuisine)
 }
@@ -77,7 +81,7 @@ func createCuisine(client pb.SteakhouseClient) {
 	for i := 0; i < 100; i++ {
 		cuisine := pb.Cuisine{
 			Id:          uuid.NewV4().String(),
-			Name:        "test",
+			Title:       "test",
 			Description: "aa",
 			Price:       12.3,
 		}
